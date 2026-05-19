@@ -1,0 +1,32 @@
+name: Daily Contribution Bot
+
+on:
+  schedule:
+    # Triggers every day at 12:00 UTC (Adjust cron format as needed)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Allows you to trigger it manually via the Actions tab
+
+jobs:
+  make-contributions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Git Configuration
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+
+      - name: Run Commit Script
+        run: |
+          chmod +x commit.sh
+          ./commit.sh
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
